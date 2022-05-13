@@ -1,7 +1,5 @@
-import 'package:flutter/foundation.dart';
-
 class FlutterStethoInspectorRequest {
-  final int friendlyNameExtra;
+  final int? friendlyNameExtra;
   final String url;
   final String method;
   final List<int> body;
@@ -10,24 +8,22 @@ class FlutterStethoInspectorRequest {
   final Map<String, String> headers;
 
   FlutterStethoInspectorRequest({
-    @required this.url,
-    @required this.method,
-    @required this.id,
-    @required this.headers,
-    this.body,
+    required this.url,
+    required this.method,
+    required this.id,
+    required this.headers,
+    required this.body,
     this.friendlyName = 'Flutter Stetho',
     this.friendlyNameExtra,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'friendlyNameExtra': friendlyNameExtra,
-      'url': url,
-      'method': method,
-      'body': body,
-      'id': id,
-      'friendlyName': friendlyName,
-      'headers': headers,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'friendlyNameExtra': friendlyNameExtra,
+        'url': url,
+        'method': method,
+        'body': body,
+        'id': id,
+        'friendlyName': friendlyName,
+        'headers': headers,
+      };
 }

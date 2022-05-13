@@ -4,33 +4,33 @@ import 'package:http/http.dart' as http;
 
 void main() {
   Stetho.initialize();
-
-  runApp(new FlutterStethoExample(
-    client: new http.Client(),
-  ));
+  runApp(FlutterStethoExample(client: http.Client()));
 }
 
 class FlutterStethoExample extends StatelessWidget {
   final http.Client client;
 
-  FlutterStethoExample({Key key, this.client}) : super(key: key);
+  FlutterStethoExample({Key? key, required this.client}) : super(key: key);
 
   fetchImage() {
     client.get(
-      'https://flutter.dev/assets/404/dash_nest-c64796b59b65042a2b40fae5764c13b7477a592db79eaf04c86298dcb75b78ea.png',
+      Uri.dataFromString(
+          'https://storage.googleapis.com/cms-storage-bucket/65361d7e1dfa118aa63b.png'),
       headers: {'Authorization': 'token'},
     );
   }
 
   fetchJson() {
     client.get(
-      'https://jsonplaceholder.typicode.com/posts/1',
+      Uri.dataFromString('https://jsonplaceholder.typicode.com/posts/1'),
       headers: {'Authorization': 'token'},
     );
   }
 
   fetchError() {
-    client.get('https://jsonplaceholder.typicode.com/postadsass/1');
+    client.get(
+      Uri.dataFromString('https://jsonplaceholder.typicode.com/postadsass/1'),
+    );
   }
 
   @override

@@ -12,28 +12,55 @@ class StethoHttpClient implements HttpClient {
   StethoHttpClient(this.client);
 
   @override
-  bool autoUncompress;
+  bool get autoUncompress => client.autoUncompress;
 
   @override
-  Duration idleTimeout;
+  Duration get idleTimeout => client.idleTimeout;
 
   @override
-  Duration connectionTimeout;
+  Duration? get connectionTimeout => client.connectionTimeout;
 
   @override
-  int maxConnectionsPerHost;
+  int? get maxConnectionsPerHost => client.maxConnectionsPerHost;
 
   @override
-  String userAgent;
+  String? get userAgent => client.userAgent;
+
+  @override
+  set autoUncompress(bool _autoUncompress) =>
+      client.autoUncompress = _autoUncompress;
+
+  @override
+  set connectionTimeout(Duration? _connectionTimeout) =>
+      client.connectionTimeout = _connectionTimeout;
+
+  @override
+  set idleTimeout(Duration _idleTimeout) => client.idleTimeout = _idleTimeout;
+
+  @override
+  set maxConnectionsPerHost(int? _maxConnectionsPerHost) =>
+      client.maxConnectionsPerHost = _maxConnectionsPerHost;
+
+  @override
+  set userAgent(String? _userAgent) => client.userAgent = _userAgent;
+
+  @override
+  set connectionFactory(
+          Future<ConnectionTask<Socket>> Function(
+                  Uri url, String? proxyHost, int? proxyPort)?
+              f) =>
+      client.connectionFactory = f;
+
+  @override
+  set keyLog(Function(String line)? callback) => client.keyLog = callback;
 
   @override
   void addCredentials(
     Uri url,
     String realm,
     HttpClientCredentials credentials,
-  ) {
-    client.addCredentials(url, realm, credentials);
-  }
+  ) =>
+      client.addCredentials(url, realm, credentials);
 
   @override
   void addProxyCredentials(
@@ -41,35 +68,35 @@ class StethoHttpClient implements HttpClient {
     int port,
     String realm,
     HttpClientCredentials credentials,
-  ) {
-    client.addProxyCredentials(host, port, realm, credentials);
-  }
+  ) =>
+      client.addProxyCredentials(host, port, realm, credentials);
 
   @override
   set authenticate(
-    Future<bool> Function(Uri url, String scheme, String realm) f,
-  ) {
-    client.authenticate = f;
-  }
+    Future<bool> Function(Uri url, String scheme, String? realm)? f,
+  ) =>
+      client.authenticate = f;
 
   @override
   set authenticateProxy(
-    Future<bool> Function(String host, int port, String scheme, String realm) f,
-  ) {
-    client.authenticateProxy = f;
-  }
+    Future<bool> Function(
+      String host,
+      int port,
+      String scheme,
+      String? realm,
+    )?
+        f,
+  ) =>
+      client.authenticateProxy = f;
 
   @override
   set badCertificateCallback(
-    bool Function(X509Certificate cert, String host, int port) callback,
-  ) {
-    client.badCertificateCallback = callback;
-  }
+    bool Function(X509Certificate cert, String host, int port)? callback,
+  ) =>
+      client.badCertificateCallback = callback;
 
   @override
-  void close({bool force: false}) {
-    client.close();
-  }
+  void close({bool force: false}) => client.close();
 
   @override
   Future<HttpClientRequest> get(String host, int port, String path) =>
@@ -114,7 +141,7 @@ class StethoHttpClient implements HttpClient {
   Future<HttpClientRequest> patchUrl(Uri url) => openUrl("patch", url);
 
   @override
-  set findProxy(String Function(Uri url) f) => client.findProxy = f;
+  set findProxy(String Function(Uri url)? f) => client.findProxy = f;
 
   @override
   Future<HttpClientRequest> open(
@@ -123,7 +150,7 @@ class StethoHttpClient implements HttpClient {
     int port,
     String path,
   ) async {
-    Uri uri = Uri(host: host,port: port, path: path);
+    Uri uri = Uri(host: host, port: port, path: path);
     return await openUrl(method, uri);
   }
 
@@ -132,10 +159,10 @@ class StethoHttpClient implements HttpClient {
     return client.openUrl(method, url).then((request) {
       final wrapped = _wrapResponse(request);
       List<int> body = [];
-      if (method.toLowerCase() != 'post' && method.toLowerCase() != 'put'){
+      if (method.toLowerCase() != 'post' && method.toLowerCase() != 'put') {
         scheduleMicrotask(() {
           MethodChannelController.requestWillBeSent(
-            new FlutterStethoInspectorRequest(
+            FlutterStethoInspectorRequest(
               url: request.uri.toString(),
               headers: headersToMap(request.headers),
               method: request.method,
@@ -149,7 +176,7 @@ class StethoHttpClient implements HttpClient {
           body.addAll(onData);
           scheduleMicrotask(() {
             MethodChannelController.requestWillBeSent(
-              new FlutterStethoInspectorRequest(
+              FlutterStethoInspectorRequest(
                 url: request.uri.toString(),
                 headers: headersToMap(request.headers),
                 method: request.method,
@@ -166,8 +193,7 @@ class StethoHttpClient implements HttpClient {
   }
 
   StethoHttpClientRequest _wrapResponse(HttpClientRequest request) {
-    final id = new Uuid().generateV4();
-
-    return new StethoHttpClientRequest(request, id);
+    final id = Uuid().generateV4();
+    return StethoHttpClientRequest(request, id);
   }
 }
